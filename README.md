@@ -17,7 +17,7 @@ This repository contains two python files:
 ```client.py``` contains four editable constants:
 - ```SERVER_ADDRESS``` - The IP address of the server to connect to
 - ```SERVER_PORT``` - The port of the server to connect to
-- ```REQUESTS``` - The number of concurrent ongoing threads
+- ```REQUESTS``` - The max number of concurrent ongoing threads
 - ```MESSAGE_SIZE``` - The max message size in bytes (*recomment* to keep the same as server)
 
 > This is run by executing the python script ```client.py```
