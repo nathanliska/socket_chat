@@ -37,7 +37,7 @@ class Server:
         try:
             conn.send(msg.encode())
         except ConnectionError as e:
-            print("Error sending to: " + get_conn_addr_str(conn) + " " + str(e))
+            print(f"Error sending to: {get_conn_addr_str(conn)} {e}")
             conn.close()
             self.remove_conn(conn)
 
@@ -58,7 +58,7 @@ class Server:
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.server.bind(self.address)
         except socket.gaierror as e:
-            print("Error creating/binding socket to: " + format_address(self.address) + " " + str(e))
+            print(f"Error creating/binding socket to: {format_address(self.address)} {e}")
             if self.server:
                 self.server.close()
                 exit(-1)
@@ -66,7 +66,7 @@ class Server:
     def client_thread(self, ip, port, connection):
         # send the client a message confirming the connection
         #print("Incoming connection from: " + str(ip) + ":" + str(port))
-        welcome_msg = "You have joined the chat at: " + get_conn_addr_str(connection)
+        welcome_msg = f"You have joined the chat at: {get_conn_addr_str(connection)}"
         self.send_msg(connection, welcome_msg)
 
         while True:
@@ -77,7 +77,7 @@ class Server:
                 data = connection.recv(MESSAGE_SIZE)
             except ConnectionError as e:
                 # CLIENT DISCONNECT HANDLER
-                disconnect_msg = "User <" + format_address((ip, port)) + "> has left the chat!"
+                disconnect_msg = f"User <{format_address((ip, port))}> has left the chat!"
                 #print("Connection to: " + get_conn_addr_str(connection) + " " + str(e))
                 print(disconnect_msg)
                 connection.close()
@@ -87,7 +87,7 @@ class Server:
             if data:
                 # CLIENT DATA RECEIVED HANDLER
                 data = data.decode()
-                broadcast_msg = "<" + format_address((ip, port)) + "> " + str(data)
+                broadcast_msg = f"<{format_address((ip, port))}> {data}"
                 print(broadcast_msg)
                 self.send_to_all(broadcast_msg)
                 #self.broadcast(connection, broadcast_msg)
@@ -100,7 +100,7 @@ class Server:
         # open socket and listen for REQUESTS number of requests
         self.open_socket()
         self.server.listen(REQUESTS)
-        print("Server listening at: " + format_address(self.address))
+        print(f"Server listening at: {format_address(self.address)}")
 
         # while loop to accept new connections
         while True:
@@ -115,13 +115,13 @@ class Server:
                 conn_thread.start()
 
                 # add connection to list and broadcast new user
-                new_user_msg = "User <" + format_address((ip, port)) + "> has joined the chat!"
+                new_user_msg = f"User <{format_address((ip, port))}> has joined the chat!"
                 print(new_user_msg)
                 self.connections.add(connection)
                 self.broadcast(connection, new_user_msg)
                 #print(self.connections)
             except ConnectionError as e:
-                print("Socket error: " + str(e))
+                print(f"Socket error {e}")
                 break
         self.server.close()
 
