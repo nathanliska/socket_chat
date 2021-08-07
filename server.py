@@ -1,6 +1,7 @@
 import socket
 from threading import Thread
 
+from datetime import datetime
 
 #host_secondary = socket.gethostname()
 SERVER_HOST_ADDRESS = 'localhost'
@@ -16,6 +17,10 @@ def get_conn_addr_str(conn):
 def format_address(address):
     # address = (ip, port)
     return f"{address[0]}:{address[1]}"
+
+
+def get_current_time():
+    return datetime.now().strftime("%H:%M:%S")
 
 
 # this class contains a server socket and can receive from and sent to client connections
@@ -53,8 +58,8 @@ class Server:
                 self.send_msg(conn, msg)
 
     def open_socket(self):
+        # create and bind socket to address
         try:
-            # create and bind socket to address
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.server.bind(self.address)
         except socket.gaierror as e:
@@ -65,20 +70,18 @@ class Server:
 
     def client_thread(self, ip, port, connection):
         # send the client a message confirming the connection
-        #print("Incoming connection from: " + str(ip) + ":" + str(port))
+        #print(f"Incoming connection from: {format_address((ip, port))}")
         welcome_msg = f"You have joined the chat at: {get_conn_addr_str(connection)}"
         self.send_msg(connection, welcome_msg)
 
         while True:
             data = None
-
             try:
                 # CLIENT MESSAGE HANDLER
                 data = connection.recv(MESSAGE_SIZE)
             except ConnectionError as e:
                 # CLIENT DISCONNECT HANDLER
-                disconnect_msg = f"User <{format_address((ip, port))}> has left the chat!"
-                #print("Connection to: " + get_conn_addr_str(connection) + " " + str(e))
+                disconnect_msg = f"[{get_current_time()}] User <{format_address((ip, port))}> has left the chat!"
                 print(disconnect_msg)
                 connection.close()
                 self.remove_conn(connection)
@@ -87,7 +90,7 @@ class Server:
             if data:
                 # CLIENT DATA RECEIVED HANDLER
                 data = data.decode()
-                broadcast_msg = f"<{format_address((ip, port))}> {data}"
+                broadcast_msg = f"[{get_current_time()}] <{format_address((ip, port))}> {data}"
                 print(broadcast_msg)
                 self.send_to_all(broadcast_msg)
                 #self.broadcast(connection, broadcast_msg)
@@ -115,11 +118,10 @@ class Server:
                 conn_thread.start()
 
                 # add connection to list and broadcast new user
-                new_user_msg = f"User <{format_address((ip, port))}> has joined the chat!"
+                new_user_msg = f"[{get_current_time()}] User <{format_address((ip, port))}> has joined the chat!"
                 print(new_user_msg)
                 self.connections.add(connection)
                 self.broadcast(connection, new_user_msg)
-                #print(self.connections)
             except ConnectionError as e:
                 print(f"Socket error {e}")
                 break
