@@ -10,12 +10,12 @@ MESSAGE_SIZE = 2048
 
 
 def get_conn_addr_str(conn):
-    return str(str(conn.getpeername()[0]) + ":" + str(conn.getpeername()[1]))
+    return f"{format_address((conn.getpeername()[0], conn.getpeername()[1]))}"
 
 
 def format_address(address):
     # address = (ip, port)
-    return str(str(address[0]) + ":" + str(address[1]))
+    return f"{address[0]}:{address[1]}"
 
 
 # this class contains a server socket and can receive from and sent to client connections
@@ -25,7 +25,7 @@ class Server:
         self.port = port
         self.address = (self.ip, self.port)
         self.server = None
-        self.connections = []
+        self.connections = set()
 
     def remove_conn(self, conn):
         # remove connection
@@ -117,7 +117,7 @@ class Server:
                 # add connection to list and broadcast new user
                 new_user_msg = "User <" + format_address((ip, port)) + "> has joined the chat!"
                 print(new_user_msg)
-                self.connections.append(connection)
+                self.connections.add(connection)
                 self.broadcast(connection, new_user_msg)
                 #print(self.connections)
             except ConnectionError as e:
