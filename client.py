@@ -2,10 +2,10 @@ import socket
 #from threading import Thread
 from concurrent.futures import ThreadPoolExecutor
 
-SERVER_ADD = 'localhost'
+SERVER_ADDRESS = 'localhost'
 SERVER_PORT = 8170
-MESSAGE_SIZE = 2048
 REQUESTS = 10
+MESSAGE_SIZE = 2048
 
 
 class Client:
@@ -29,7 +29,7 @@ class Client:
         try:
             self.client.connect(self.address)
         except socket.error as e:
-            print("Cannot connect to server: " + str(self.ip) + ":" + str(self.port) + " " + str(e))
+            print(f"Cannot connect to server: {self.ip}:{self.port} {e}")
             exit(-1)
 
         executor = ThreadPoolExecutor(REQUESTS)
@@ -43,7 +43,7 @@ class Client:
             try:
                 data = self.client.recv(MESSAGE_SIZE)
             except ConnectionError as e:
-                print("Connection closed! " + str(e))
+                print(f"Connection closed! {e}")
 
             if data:
                 print(data.decode())
@@ -51,5 +51,5 @@ class Client:
                 break
 
 
-client = Client(SERVER_ADD, SERVER_PORT)
+client = Client(SERVER_ADDRESS, SERVER_PORT)
 client.run()

@@ -3,7 +3,7 @@ from threading import Thread
 
 
 #host_secondary = socket.gethostname()
-SERVER_HOST = 'localhost'
+SERVER_HOST_ADDRESS = 'localhost'
 SERVER_PORT = 8170
 REQUESTS = 100
 MESSAGE_SIZE = 2048
@@ -127,5 +127,5 @@ class Server:
 
 
 # instantiate a server and run it
-server = Server(SERVER_HOST, SERVER_PORT)
+server = Server(SERVER_HOST_ADDRESS, SERVER_PORT)
 server.run()
