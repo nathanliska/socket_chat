@@ -23,8 +23,8 @@ def get_current_time():
     return datetime.now().strftime("%H:%M:%S")
 
 
+# this class contains a server socket and can receive from and sent to client connections
 class Server:
-    """The Server class contains a server socket connection and can receive from and sent to a set of client connections"""
     def __init__(self, ip, port):
         self.ip = ip
         self.port = port
@@ -33,7 +33,7 @@ class Server:
         self.connections = set()
 
     def remove_conn(self, conn):
-        # close and remove connection
+        # remove connection
         conn.close()
         if conn in self.connections:
             self.connections.remove(conn)
@@ -53,7 +53,7 @@ class Server:
 
     def receive_msg(self, conn):
         # attempt to receive data from a connection
-        # pauses until data received or disconnect
+        # blocking until data received or disconnect
         data = None
         try:
             # RECEIVE data
@@ -93,27 +93,37 @@ class Server:
         self.connections.add(connection)
         print(f"[{get_current_time()}] [CONSOLE] Incoming connection from: {format_address((ip, port))}")
 
-        # send confirmation to connection and broadcasts new user
-        self.send_msg(connection, f"[{get_current_time()}] You have joined the chat at <{format_address((ip, port))}!>")
-        self.broadcast(connection, f"[{get_current_time()}] User <{format_address((ip, port))}> has joined the chat!")
+        # receive and decode request headers from connection
+        request_header = None
+        data = self.receive_msg(connection)
+        if data is not None or data != "":
+            request_header = data.decode()
+        else:
+            print(f"[{get_current_time()}] No request headers received, closing...")
+            self.remove_conn(connection)
+            exit(-1)
 
-        # loop to handle receiving and sending data
-        while True:
-            data = self.receive_msg(connection)
+        # if the icon is being requested
+        if "favicon.ico" in request_header:
+            print(f"[{get_current_time()}] [CONSOLE] Sending icon response and disconnecting: {format_address((ip, port))}")
+            with open("icon.png", "rb") as image:
+                f = image.read()
+                b = bytearray(f)
 
-            if data:
-                # CLIENT DATA RECEIVED HANDLER
-                data = data.decode()
-                broadcast_msg = f"[{get_current_time()}] <{format_address((ip, port))}>: {data}"
-                print(broadcast_msg)
-                self.broadcast(connection, broadcast_msg)
-                # self.send_to_all(broadcast_msg)
-            else:
-                self.remove_conn(connection)
-                disconnect_msg = f"[{get_current_time()}] User <{format_address((ip, port))}> has left the chat!"
-                print(f"[{get_current_time()}] [CONSOLE] Disconnect from: {format_address((ip, port))}")
-                self.send_to_all(disconnect_msg)
-                break
+            response_header = f"HTTP/1.1 OK\r\nServer: Python 3.9 Server\r\nContent-Type: image/png; encoding=utf-8\r\nContent-Length: {len(b)}\r\nConnection: Close\r\n\r\n"
+            self.send_msg(connection, response_header)
+            connection.sendall(b)
+        # if anything else is requested
+        else:
+            # create a response body and response header
+            response_body = f"<html><head><title>Socket Test!</title></head><body><h1>Hello Connection <{format_address((ip, port))}>!</h1><p>{request_header}</p></body></html>"
+            response_header = f"HTTP/1.1 OK\r\nServer: Python 3.9 Server\r\nContent-Type: text/html; encoding=utf-8\r\nContent-Length: {len(response_body)}\r\nConnection: Close\r\n\r\n"
+
+            print(f"[{get_current_time()}] [CONSOLE] Sending html response and disconnecting: {format_address((ip, port))}")
+            # send the response header and body and close connection
+            self.send_msg(connection, response_header)
+            self.send_msg(connection, response_body)
+            self.remove_conn(connection)
 
     def run(self):
         # open socket and listen for REQUESTS number of requests
