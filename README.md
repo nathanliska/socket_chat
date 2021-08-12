@@ -21,3 +21,5 @@
 - ```MESSAGE_SIZE``` - The max message size in bytes (*recomment* to keep the same as server)
 
 ###### This is run by executing the python script ```client.py``` or batchfile ```run_client_windows.cmd``` which runs the script
+
+![An example of the server and client running can be seen in the image](https://imgur.com/a/IF58lrQ)
