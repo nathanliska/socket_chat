@@ -9,6 +9,8 @@ SERVER_PORT = 8170
 REQUESTS = 100
 MESSAGE_SIZE = 2048
 
+IMAGE_LOC = "icon.png"
+
 
 def get_conn_addr_str(conn):
     return f"{format_address((conn.getpeername()[0], conn.getpeername()[1]))}"
@@ -96,17 +98,17 @@ class Server:
         # receive and decode request headers from connection
         request_header = None
         data = self.receive_msg(connection)
-        if data is not None or data != "":
+        if data is not None and data != b'':
             request_header = data.decode()
         else:
-            print(f"[{get_current_time()}] No request headers received, closing...")
+            print(f"[{get_current_time()}] [CONSOLE] No request headers received, closing...")
             self.remove_conn(connection)
             exit(-1)
 
         # if the icon is being requested
         if "favicon.ico" in request_header:
             print(f"[{get_current_time()}] [CONSOLE] Sending icon response and disconnecting: {format_address((ip, port))}")
-            with open("icon.png", "rb") as image:
+            with open(IMAGE_LOC, "rb") as image:
                 f = image.read()
                 b = bytearray(f)
 
