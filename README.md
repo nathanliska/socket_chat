@@ -22,4 +22,4 @@
 
 ###### This is run by executing the python script ```client.py``` or batchfile ```run_client_windows.cmd``` which runs the script
 
-![An example of the server and client running can be seen in the image](https://imgur.com/a/IF58lrQ)
+![An example of the server and client running](https://i.imgur.com/wynbHZi.png)

@@ -15,4 +15,4 @@
 
 ###### This is run by executing the python script ```server_http.py```
 
-![An example of the response can be seen in the image](https://imgur.com/a/5bxdqpu)
+![An example of the HTTP response and body response](https://i.imgur.com/DMVbuco.png)
