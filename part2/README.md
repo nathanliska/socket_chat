@@ -1,0 +1,1 @@
+![An example of the server and client running](https://i.imgur.com/zaBYGn2.png)

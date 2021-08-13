@@ -89,10 +89,6 @@ class Server:
         self.connections.add(connection)
         print(f"[{get_current_time()}] [CONSOLE] Incoming connection from: {format_address((ip, port))}")
 
-        # send confirmation to connection and broadcasts new user
-        self.send_msg(connection, f"[{get_current_time()}] You have joined the chat at <{format_address((ip, port))}!>")
-        self.broadcast(connection, f"[{get_current_time()}] User <{format_address((ip, port))}> has joined the chat!")
-
         # loop to handle receiving and sending data
         while True:
             data = self.receive_msg(connection)
@@ -103,7 +99,6 @@ class Server:
                 broadcast_msg = f"[{get_current_time()}] <{format_address((ip, port))}>: {data}"
                 print(broadcast_msg)
                 self.broadcast(connection, broadcast_msg)
-                # self.send_to_all(broadcast_msg)
             else:
                 self.remove_conn(connection)
                 disconnect_msg = f"[{get_current_time()}] User <{format_address((ip, port))}> has left the chat!"

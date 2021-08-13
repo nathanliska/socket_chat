@@ -1,6 +1,6 @@
 # socket_chat
 
-### A basic python socket chat contained in the terminal
+### A basic python socket chat contained in the terminal - Part 5
 
 ##### This repository contains two python files:
 - ```server.py```
